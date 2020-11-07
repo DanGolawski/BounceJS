@@ -3,8 +3,16 @@ class Ball {
     y = 20;
     radius = 10
     color = 'orange';
+    defaultParameters = {
+        speed: 5,
+        gravity: 7,
+        jumpingForce: 14,
+        bouncingForce: 9
+    }
     speed = 5;
     gravity = 7;
+    jumpForce = 14;
+    bouncingForce = 9;
     context;
     keysPressed = {
         left: false,
@@ -101,9 +109,9 @@ class Ball {
         }
     }
 
-    handleJumping() {
+    handleJumping(force) {
         this.isJumping = true;
-        let jumpForce = 2 * this.gravity;
+        let jumpForce = !force ? this.jumpForce : force;
         const jumpInterval = setInterval(() => {
             let counter = jumpForce;
             while (counter > 0 && this.movement.up) {
@@ -135,7 +143,22 @@ class Ball {
             if (!this.movement.down) {
                 clearInterval(fallInterval);
                 this.isFalling = false;
+                this.handleBouncing();
             }
         }, 20);
+    }
+
+    handleBouncing() {
+        if (this.keysPressed.up) {
+            this.handleJumping()
+            this.bouncingForce = this.defaultParameters.bouncingForce;
+        }
+        else if (this.bouncingForce > 0) {
+            this.handleJumping(this.bouncingForce);
+            this.bouncingForce -= 3;
+        }
+        else {
+            this.bouncingForce = this.defaultParameters.bouncingForce;
+        }
     }
 }
